@@ -1,0 +1,4 @@
+const a=require('node:assert/strict'),M=require('./manual-core');
+a.equal(M.query('RG 紅異端'),'RG アストレイ レッドフレーム');a.equal(new URL(M.searchURL('RG 紅異端')).hostname,'manual.bandai-hobby.net');a.ok(M.scorePage('C O L O R  G U I D E').candidate);a.ok(M.scorePage('白95% 灰5% 黑100%').candidate);a.equal(M.scorePage('Step 1 Assembly').candidate,false);a.equal(M.scorePage('').candidate,false);a.throws(()=>M.searchURL('   '));
+const w=(text,x,y,width=100)=>({text,bbox:{x0:x,x1:x+width,y0:y,y1:y+20}});const rows=[{words:[w('Body:',0,0),w('Chest:',400,0)]},{words:[w('White(95%)+Gray(5%)',0,30,240),w('Black(70%)+White(30%)',400,30,240)]}];
+const blocks=M.recipeBlocks(rows);a.equal(blocks.length,2);a.ok(blocks[0].text.includes('White'));a.ok(!blocks[0].text.includes('Black'));a.equal(M.filterWords(rows[0].words,{x:0,y:0,w:150,h:50}).length,1);console.log('Manual tests passed: search aliases, title detection, empty/scanned pages, column separation, crop filtering.');
