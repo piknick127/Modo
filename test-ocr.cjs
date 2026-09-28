@@ -1,0 +1,14 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const code=fs.readFileSync(__dirname+'/app.js','utf8').split('// OCR_LAYOUT_START')[1].split('// OCR_LAYOUT_END')[0];
+const ctx={};vm.createContext(ctx);vm.runInContext(code,ctx);
+const word=(text,x,y,w=30,h=20)=>({text,bbox:{x0:x,y0:y,x1:x+w,y1:y+h}});
+const block=words=>({paragraphs:[{lines:words.map(w=>({words:[w]}))}]});
+const input=[block([word('右上',150,12),word('右下',150,52)]),block([word('左下',10,50),word('左上',10,10)])];
+let out=ctx.layoutOCR(input,{x:100,y:200,w:400,h:200},200,100);
+assert.equal(out.length,2);assert.deepEqual(Array.from(out.flatMap(r=>r.words.map(w=>w.text))),['左上','右上','左下','右下']);
+assert.equal(out[0].words[0].bbox.x0,120);assert.equal(out[0].words[0].bbox.y0,220);assert.ok(out[0].text.includes('｜'));
+out=ctx.layoutOCR([block([word('白',0,0,10),word('色',11,1,10)])],{x:0,y:0,w:100,h:100},100,100);assert.equal(out[0].text,'白色');
+assert.equal(ctx.layoutOCR(null,{x:0,y:0,w:100,h:100},100,100).length,0);
+assert.equal(ctx.layoutOCR([block([{text:'bad',bbox:{x0:NaN}}])],{x:0,y:0,w:100,h:100},100,100).length,0);
+const fallback=[{paragraphs:[{lines:[word('整行',1,1)]}]}];assert.equal(ctx.layoutOCR(fallback,{x:0,y:0,w:100,h:100},100,100)[0].text,'整行');
+console.log('OCR tests passed: shuffled columns, baseline offsets, crop scaling, CJK spacing, missing/invalid boxes, line fallback.');
