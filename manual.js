@@ -24,7 +24,7 @@ async function showPDFPage(number){
  status('PDF 頁面已載入。黃色顯示可擷取文字；掃描圖片請使用 OCR。');
  }catch(e){pdfStatus('頁面讀取失敗：'+e.message)}finally{busy=false;pdfBusy(false);$('ocr').disabled=!sourceImage;$('extractPDF').disabled=!pdfWords.length}
 }
-$('manualSearch').onsubmit=e=>{e.preventDefault();try{const url=ManualCore.searchURL($('modelQuery').value);$('officialLink').href=url;$('officialLink').hidden=false;$('searchNote').textContent='搜尋詞：'+ManualCore.query($('modelQuery').value)+'。請確認等級、比例與版本；從官方頁取得 PDF 後在下方上傳。';window.open(url,'_blank','noopener,noreferrer')}catch(e){$('searchNote').textContent=e.message}};
+$('manualSearch').onsubmit=e=>{e.preventDefault();try{const url=ManualCore.searchURL($('modelQuery').value);$('officialLink').href=url;$('officialLink').hidden=false;$('searchNote').textContent='搜尋詞：'+ManualCore.query($('modelQuery').value)+'。請確認等級、比例與版本；若官方閱讀器沒有下載按鈕，請截取配色頁，再到「01 上傳配色圖片」辨識。已有 PDF 也可在下方上傳。';window.open(url,'_blank','noopener,noreferrer')}catch(e){$('searchNote').textContent=e.message}};
 $('pdfFile').onchange=async e=>{
  const file=e.target.files[0];if(!file)return;if(busy){e.target.value='';return}if(!/\.pdf$/i.test(file.name)||file.size>40*1024*1024){pdfStatus('請選擇 40 MB 以內的 PDF');e.target.value='';return}
  busy=true;pdfBusy(true);const generation=++pdfGeneration;pdfFilename=file.name;
